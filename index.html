@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>АК · Режиссёр</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      background-color: #0e0e0e;
+      color: white;
+      font-family: 'Unbounded', sans-serif;
+    }
+    canvas#bg {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      z-index: -2;
+      filter: blur(60px);
+    }
+    .content {
+      position: relative;
+      z-index: 10;
+    }
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      white-space: nowrap;
+    }
+    .nav-title {
+      font-size: 1.5rem;
+      font-weight: bold;
+      transition: color 1s ease;
+    }
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+    }
+    video.video-bg {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      object-fit: cover;
+      z-index: -3;
+      filter: brightness(0.4);
+    }
+    section {
+      padding: 4rem 1rem;
+    }
+    .video-container {
+      width: 100%;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    .video-wrapper {
+      position: relative;
+      padding-bottom: 56.25%; /* 16:9 aspect ratio */
+      height: 0;
+      overflow: hidden;
+      border-radius: 8px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .video-wrapper iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    
+    /* Мобильное меню */
+    @media (max-width: 640px) {
+      nav {
+        padding: 1rem;
+      }
+      .nav-links {
+        gap: 0.8rem;
+      }
+      .nav-links a {
+        font-size: 0.95rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="bg"></canvas>
+  <video class="video-bg" autoplay muted loop playsinline>
+    <source src="https://cdn.coverr.co/videos/coverr-passing-train-5416/1080p.mp4" type="video/mp4">
+  </video>
+
+  <div class="content">
+    <nav>
+      <div class="nav-title" id="akTitle">АК</div>
+      <div class="nav-links">
+        <a href="#about" class="hover:text-pink-400 transition">Обо мне</a>
+        <a href="#work" class="hover:text-pink-400 transition">Работы</a>
+        <a href="#contact" class="hover:text-pink-400 transition">Контакты</a>
+      </div>
+    </nav>
+
+    <!-- Остальное содержимое без изменений -->
+    <section id="about" class="mt-10 md:mt-20 text-center px-4">
+      <h1 class="text-3xl md:text-4xl font-bold mb-6">Арина Копейкина</h1>
+      <p class="text-lg max-w-xl mx-auto">Режиссёр визуальных историй. Фокус на кинематографическую эстетику, современную выразительность и глубокий смысл.</p>
+    </section>
+
+    <section id="work" class="py-12">
+      <div class="video-container">
+        <h2 class="text-3xl font-bold mb-12 text-center">Работы</h2>
+        
+        <div class="video-wrapper">
+          <iframe
+            title="vimeo-player"
+            src="https://player.vimeo.com/video/1030868189?h=51e80bc071"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact" class="max-w-2xl mx-auto text-center px-4">
+      <h2 class="text-3xl font-bold mb-8">Контакты</h2>
+      <div class="space-y-2">
+        <p class="text-lg">Email: <a href="mailto:arina@example.com" class="underline hover:text-pink-400">arina@example.com</a></p>
+        <p class="text-lg">Instagram: <a href="https://instagram.com/arina" class="underline hover:text-pink-400" target="_blank">@arina</a></p>
+        <p class="text-lg">Vimeo: <a href="https://vimeo.com/arina" class="underline hover:text-pink-400" target="_blank">vimeo.com/arina</a></p>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('bg');
+    const ctx = canvas.getContext('2d');
+    const akTitle = document.getElementById('akTitle');
+    let w, h;
+    let blobs = [];
+    let colorChangeInterval;
+
+    function resize() {
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    class Blob {
+      constructor() {
+        this.reset();
+        this.color = `hsla(${Math.random() * 360}, 100%, 70%, 0.6)`;
+      }
+      reset() {
+        this.x = Math.random() * w;
+        this.y = Math.random() * h;
+        this.r = 60 + Math.random() * 80;
+        this.dx = -0.5 + Math.random();
+        this.dy = -0.5 + Math.random();
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.fillStyle = this.color;
+        ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      move() {
+        this.x += this.dx;
+        this.y += this.dy;
+        if (this.x < -this.r || this.x > w + this.r || this.y < -this.r || this.y > h + this.r) {
+          this.reset();
+        }
+      }
+    }
+
+    for (let i = 0; i < 15; i++) blobs.push(new Blob());
+
+    function animate() {
+      ctx.clearRect(0, 0, w, h);
+      blobs.forEach(b => {
+        b.move();
+        b.draw();
+      });
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    // Функция для изменения цвета "АК"
+    function changeAkColor() {
+      const hue = Math.floor(Math.random() * 360);
+      akTitle.style.color = `hsl(${hue}, 100%, 70%)`;
+    }
+
+    // Меняем цвет каждые 3 секунды
+    colorChangeInterval = setInterval(changeAkColor, 3000);
+    changeAkColor(); // Вызываем сразу при загрузке
+
+    // Остановка интервала при скрытии страницы
+    document.addEventListener('visibilitychange', function() {
+      if (document.hidden) {
+        clearInterval(colorChangeInterval);
+      } else {
+        colorChangeInterval = setInterval(changeAkColor, 3000);
+      }
+    });
+  </script>
+</body>
+</html>
